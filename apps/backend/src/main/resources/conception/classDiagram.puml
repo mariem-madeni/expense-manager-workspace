@@ -1,0 +1,76 @@
+@startuml
+enum Rolename {
+  Employer
+  Admin
+}
+class User{
+-idUser : Long
+-firstname:String
+-lastname:String
+-gender:String
+-address:String
+-email:String
+-password:string
+-role:Role
+-idImage:Long
++ authentifier() : void()
+}
+Enum Role{
+-idRole:Long
+-role:Rolename
+}
+class Image{
+-idImage:Long
+-idUser:Long
+-imageData:Byte[]
+-DateCreation :Date
+}
+class Employer{
++consulterProfil(): void
++modifierProfil(): void
++consulterdepenses(): void
++Ajouterdepense(): void
++modifierdepense(): void
++supprimerdepense(): void
++ajpoterRevenu(): void
++modifierRevenu()
++supprimerRevenu(): void
++consulterHistorique(): void
++supprimerHistorique(): void
+}
+class Admin{
++consulterListeComptes()
++modifierCompte()
++ajouterCompte()
++supprimerCompte()
+}
+class Depense{
+-idDepense : Long
+-titreDepense : String
+-montantDep : Double
+-DateCreation  : Date
+-descriptionDep : String
+-idCategory : Long
+}
+class Revenu{
+-idRevenu:Long
+-titreRevenu:Long
+-montantRev:Double
+-dateCreation:Date
+-desRev:String
+-idCategory:Long
+}
+class Category{
+-idCategory:Long
+-desCategory:String
+-DateCreation :Date
+}
+Employer --|> User
+Admin --|>User
+User "1" -- "1"Image
+User"*" -- "1"Role
+Employer"1" -- "*"Depense
+Employer"1" -- "*"Revenu
+Depense "*" -- "1" Category
+Revenu "*" -- "1" Category
+@enddef

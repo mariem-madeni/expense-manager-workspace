@@ -1,0 +1,41 @@
+@startuml
+|Admin|
+start
+:Créer compte employé;
+
+|Système|
+if (Employé existe ?) then (Oui)
+  :Afficher message "Employé existe déjà";
+else (Non)
+  :Ajouter employé en base;
+  :Envoyer email de confirmation;
+endif
+
+|Employé|
+:Se connecter;
+
+|Système|
+if (Authentification valide ?) then (Oui)
+  :Afficher tableau de bord;
+else (Non)
+  :Message "Email ou mot de passe invalide";
+endif
+
+|Employé|
+:Ajouter une dépense;
+
+|Système|
+:Valider et enregistrer dépense;
+
+:Afficher nouvelle liste des dépenses;
+
+:Ajouter un revenu;
+
+:Afficher liste des revenus;
+
+:Consulter historique;
+
+stop
+@enduml
+
+

@@ -1,14 +1,12 @@
-# Use Java 21 base image
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jdk-jammy
 
-# Set working directory
 WORKDIR /app
 
-# Copy the built jar into the container
-COPY target/expense-manager-1.0-SNAPSHOT.jar app.jar
+COPY pom.xml .
+COPY src ./src
 
-# Expose port 8081
-EXPOSE 8081
+RUN apt-get update && apt-get install -y maven && mvn package -DskipTests
 
-# Run the app
-ENTRYPOINT ["java", "-jar", "app.jar"]
+EXPOSE 8083
+
+CMD ["java", "-jar", "target/expense-manager-1.0-SNAPSHOT.jar"]

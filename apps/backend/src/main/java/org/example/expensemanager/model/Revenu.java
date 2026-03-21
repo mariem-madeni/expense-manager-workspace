@@ -31,4 +31,7 @@ public class Revenu {
   @JoinColumn(name ="iduser")
   private User user;
 
+  public void setIdrevenu(Long idrevenu) {
+    this.idrevenu = idrevenu;
+  }
 }

@@ -99,7 +99,6 @@ cd finance-saas-crm
 docker-compose up --build
 ```
 
-The app will be available at **http://localhost**
 
 ### Environment Variables (GitHub Secrets)
 

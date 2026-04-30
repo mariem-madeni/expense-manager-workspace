@@ -1,77 +1,228 @@
-# ExpenseManagerWorkspace
+# 💼 Finance SaaS CRM
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+> A production-ready multi-tenant Finance CRM built with Spring Boot, Angular, PostgreSQL, and Docker.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is almost ready ✨.
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-6DB33F?style=flat&logo=springboot&logoColor=white)
+![Angular](https://img.shields.io/badge/Angular-17+-DD0031?style=flat&logo=angular&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=flat&logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker&logoColor=white)
+![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?style=flat&logo=githubactions&logoColor=white)
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/intro#learn-nx?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+---
 
-## Finish your CI setup
+## 📌 Overview
 
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/3jk4AB7u0D)
+Finance SaaS CRM is a transformation of a basic expense manager into a **full multi-tenant SaaS platform**. Each company (tenant) has its own isolated data — users, expenses, revenues, clients, and invoices — all served by a single backend.
 
+---
 
-## Run tasks
+## 🏗️ Architecture
 
-To run tasks with Nx use:
-
-```sh
-npx nx <target> <project-name>
+```
+                        ┌─────────────────────────┐
+                        │     Nginx  (port 80)     │
+                        │  Reverse Proxy / Router  │
+                        └────────┬────────┬────────┘
+                                 │        │
+                    /api/*       │        │    /
+              ┌──────────────────┘        └──────────────────┐
+              ▼                                              ▼
+   ┌─────────────────────┐                     ┌─────────────────────┐
+   │   Spring Boot API   │                     │   Angular Frontend  │
+   │     (port 8080)     │                     │   (static files)    │
+   └──────────┬──────────┘                     └─────────────────────┘
+              │
+              ▼
+   ┌─────────────────────┐
+   │   PostgreSQL 15     │
+   │     (port 5432)     │
+   └─────────────────────┘
 ```
 
-For example:
+> 4 Docker containers orchestrated with Docker Compose behind a single Nginx reverse proxy.
 
-```sh
-npx nx build myproject
+---
+
+## ✨ Features
+
+### 🏢 Multi-Tenant SaaS
+- Every resource is scoped to a **Company** (tenant)
+- One backend serves all companies with full data isolation
+- Subscription tiers: `FREE` / `STARTER` / `PRO`
+
+### 🔐 Security
+- JWT authentication with BCrypt password hashing
+- Role-based access control (3 roles)
+- Protected REST endpoints per role
+
+### 👥 Role System
+| Role | Description |
+|------|-------------|
+| `SUPER_ADMIN` | Platform owner — full access |
+| `COMPANY_ADMIN` | Manages their company and users |
+| `COMPANY_USER` | Regular employee |
+
+### 📊 Modules
+- **Expenses** — track and categorize company spending
+- **Revenue** — log income per user/category
+- **Clients** — CRM client management
+- **Invoices** — linked to clients, with status tracking (`PENDING` / `PAID` / `CANCELLED`)
+- **Categories** — classify expenses and revenues
+- **Users** — scoped to company with role management
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Backend | Spring Boot (Java 21), Spring Security, JWT |
+| Frontend | Angular 17+, Standalone Components |
+| Database | PostgreSQL 15 (Hibernate auto DDL) |
+| Reverse Proxy | Nginx |
+| Containerization | Docker + Docker Compose |
+| CI/CD | GitHub Actions |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Docker & Docker Compose installed
+- Git
+
+### Clone & Run
+
+```bash
+git clone https://github.com/your-username/finance-saas-crm.git
+cd finance-saas-crm
+docker-compose up --build
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+The app will be available at **http://localhost**
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### Environment Variables (GitHub Secrets)
 
-## Add new projects
+| Secret | Description |
+|--------|-------------|
+| `JWT_SECRET` | Secret key for JWT signing |
+| `DB_PASSWORD` | PostgreSQL password |
+| `DB_USERNAME` | PostgreSQL username |
 
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
+---
 
-To install a new plugin you can use the `nx add` command. Here's an example of adding the React plugin:
-```sh
-npx nx add @nx/react
+## 🗄️ Database Schema
+
+```
+company ──< users ──< depense
+        │          └─< revenu
+        ├──< client ──< invoice
+        └──< category
 ```
 
-Use the plugin's generator to create new projects. For example, to create a new React app or library:
+| Table | Key Fields |
+|-------|-----------|
+| `company` | id, name, email, subscription, isActive |
+| `users` | id, firstname, lastname, email, company_id, role_id |
+| `role` | id, rolename |
+| `depense` | id, titre, montant, category_id, user_id, company_id |
+| `revenu` | id, titre, montant, category_id, user_id, company_id |
+| `client` | id, name, email, phone, company_id |
+| `invoice` | id, amount, status, client_id, company_id |
+| `category` | id, descategory |
+| `image` | id, imagedata (bytea), user_id |
 
-```sh
-# Generate an app
-npx nx g @nx/react:app demo
+---
 
-# Generate a library
-npx nx g @nx/react:lib some-lib
+## 📁 Project Structure
+
+```
+finance-saas-crm/
+│
+├── backend/                  # Spring Boot API
+│   ├── src/main/java/
+│   │   ├── config/           # Security, JWT config
+│   │   ├── controllers/      # REST endpoints
+│   │   ├── models/           # JPA entities
+│   │   ├── repositories/     # Spring Data JPA
+│   │   └── services/         # Business logic
+│   └── Dockerfile
+│
+├── frontend/                 # Angular 17+ app
+│   ├── src/app/
+│   │   ├── components/       # UI components
+│   │   ├── guards/           # Auth guards
+│   │   ├── interceptors/     # JWT interceptor
+│   │   └── services/         # API services
+│   └── Dockerfile
+│
+├── nginx/
+│   └── nginx.conf            # Reverse proxy config
+│
+├── docker-compose.yml
+└── .github/
+    └── workflows/
+        └── deploy.yml        # CI/CD pipeline
 ```
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
+---
 
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## ⚙️ CI/CD Pipeline
 
+On every push to `main`:
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```
+Push to main
+    │
+    ▼
+GitHub Actions
+    ├── Build Spring Boot JAR
+    ├── Build Angular (dist/expense-manager/browser)
+    ├── Build Docker images
+    └── Deploy containers
+```
 
-## Install Nx Console
+> **Important fix** — ensure your frontend Dockerfile uses the correct dist path:
+> ```dockerfile
+> # ✅ Correct
+> COPY --from=build /app/dist/expense-manager/browser /usr/share/nginx/html
+> ```
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+---
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## 🗺️ Roadmap
 
-## Useful links
+- [x] Multi-tenant architecture
+- [x] JWT security + role system
+- [x] Docker Compose (4 containers)
+- [x] GitHub Actions CI/CD
+- [x] Company, Client, Invoice entities
+- [ ] Angular frontend (login, dashboard, CRUD pages)
+- [ ] KPI dashboard with charts
+- [ ] Company settings & team invite flow
+- [ ] Subscription management
+- [ ] Marketing landing page
 
-Learn more:
+---
 
-- [Learn more about this workspace setup](https://nx.dev/getting-started/intro#learn-nx?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## 🎨 Design System
 
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+| Token | Value |
+|-------|-------|
+| Primary | `#4F46E5` |
+| Secondary | `#06B6D4` |
+| Neutral | `#F8FAFC` |
+
+---
+
+## 👩‍💻 Author
+
+**Madeni Mariem** — Full-Stack Developer  
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-madenimariem-0077B5?style=flat&logo=linkedin)](https://linkedin.com/in/madenimariem-b3650a294)
+[![GitHub](https://img.shields.io/badge/GitHub-nanami3322-181717?style=flat&logo=github)](https://github.com/nanami3322)
+
+---
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).

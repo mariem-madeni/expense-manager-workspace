@@ -214,14 +214,6 @@ GitHub Actions
 
 ---
 
-## 👩‍💻 Author
-
-**Madeni Mariem** — Full-Stack Developer  
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-madenimariem-0077B5?style=flat&logo=linkedin)](https://linkedin.com/in/madenimariem-b3650a294)
-[![GitHub](https://img.shields.io/badge/GitHub-nanami3322-181717?style=flat&logo=github)](https://github.com/nanami3322)
-
----
-
 ## 📄 License
 
 This project is open source and available under the [MIT License](LICENSE).
